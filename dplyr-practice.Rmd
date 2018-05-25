@@ -1,0 +1,57 @@
+---
+title: "Practice dplyr"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## This is a tutorial I will expand upon while I practice using `dplyr`
+
+
+
+```{r intro}
+library("dplyr")
+library("downloader")
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/msleep_ggplot2.csv"
+filename <- "msleep_ggplot2.csv"
+```
+
+```{r getdata}
+if (!file.exists(filename)) download(url,filename)
+msleep <- read.csv("msleep_ggplot2.csv")
+head(msleep)
+```
+
+## Important `dplyr` verbs
+
+* `select()`
+* `filter()`
+* `arrange()`
+* `mutate()`
+* `summarise()`
+* `group_by()`
+
+| Verb | Description |
+|:---|:---|
+|`select()`| Choose columns |
+| `filter()`| Choose rows |
+| `arrange()`| Re-order or arrange |
+| `mutate()`| Create new columns |
+| `summarise()`| Summarise values |
+| `group_by()`| Like SQL `group by`|
+
+### Selecting columns using `select()`
+
+```{r dplyr1}
+sleepData <- select(msleep, name, sleep_total)
+head(sleepData)
+```
+
+```{r dplyr2}
+head(select(msleep, -name))
+```
+```{r dplyr3}
+
+```
