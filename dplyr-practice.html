@@ -156,6 +156,7 @@ head(msleep)</code></pre>
 </div>
 <div id="important-dplyr-verbs" class="section level2">
 <h2>Important <code>dplyr</code> verbs</h2>
+<p>These <code>dplyr</code> verbs are important to remember:</p>
 <ul>
 <li><code>select()</code></li>
 <li><code>filter()</code></li>
@@ -200,6 +201,7 @@ head(msleep)</code></pre>
 </table>
 <div id="selecting-columns-using-select" class="section level3">
 <h3>Selecting columns using <code>select()</code></h3>
+<p>Select the <code>name</code> and <code>sleep_total</code> columns:</p>
 <pre class="r"><code>sleepData &lt;- select(msleep, name, sleep_total)
 head(sleepData)</code></pre>
 <pre><code>##                         name sleep_total
@@ -209,6 +211,7 @@ head(sleepData)</code></pre>
 ## 4 Greater short-tailed shrew        14.9
 ## 5                        Cow         4.0
 ## 6           Three-toed sloth        14.4</code></pre>
+<p>Select all but the <code>name</code> column</p>
 <pre class="r"><code>head(select(msleep, -name))</code></pre>
 <pre><code>##        genus  vore        order conservation sleep_total sleep_rem
 ## 1   Acinonyx carni    Carnivora           lc        12.1        NA
@@ -224,7 +227,154 @@ head(sleepData)</code></pre>
 ## 4   0.1333333   9.1 0.00029   0.019
 ## 5   0.6666667  20.0 0.42300 600.000
 ## 6   0.7666667   9.6      NA   3.850</code></pre>
+<p>Select a range of columns using the <code>:</code> operator</p>
+<pre class="r"><code>head(select(msleep, name:order))</code></pre>
+<pre><code>##                         name      genus  vore        order
+## 1                    Cheetah   Acinonyx carni    Carnivora
+## 2                 Owl monkey      Aotus  omni     Primates
+## 3            Mountain beaver Aplodontia herbi     Rodentia
+## 4 Greater short-tailed shrew    Blarina  omni Soricomorpha
+## 5                        Cow        Bos herbi Artiodactyla
+## 6           Three-toed sloth   Bradypus herbi       Pilosa</code></pre>
+<div id="other-matching-criteria" class="section level4">
+<h4>Other matching criteria</h4>
+<p>Select all columns starting with the string “sl” using the <code>starts_with()</code> function</p>
+<pre class="r"><code>head(select(msleep, starts_with(&quot;sl&quot;)))</code></pre>
+<pre><code>##   sleep_total sleep_rem sleep_cycle
+## 1        12.1        NA          NA
+## 2        17.0       1.8          NA
+## 3        14.4       2.4          NA
+## 4        14.9       2.3   0.1333333
+## 5         4.0       0.7   0.6666667
+## 6        14.4       2.2   0.7666667</code></pre>
+<p>Do something similar with <code>ends_with()</code></p>
+<pre class="r"><code>head(select(msleep, ends_with(&quot;wt&quot;)))</code></pre>
+<pre><code>##   brainwt  bodywt
+## 1      NA  50.000
+## 2 0.01550   0.480
+## 3      NA   1.350
+## 4 0.00029   0.019
+## 5 0.42300 600.000
+## 6      NA   3.850</code></pre>
+<p><code>contains()</code></p>
+<pre class="r"><code>head(select(msleep, contains(&quot;_&quot;)))</code></pre>
+<pre><code>##   sleep_total sleep_rem sleep_cycle
+## 1        12.1        NA          NA
+## 2        17.0       1.8          NA
+## 3        14.4       2.4          NA
+## 4        14.9       2.3   0.1333333
+## 5         4.0       0.7   0.6666667
+## 6        14.4       2.2   0.7666667</code></pre>
+<p><code>matches()</code> for regular expressions</p>
+<pre class="r"><code>head(select(msleep, matches(&quot;*o[rn]*&quot;)))</code></pre>
+<pre><code>##    vore        order conservation sleep_total  bodywt
+## 1 carni    Carnivora           lc        12.1  50.000
+## 2  omni     Primates         &lt;NA&gt;        17.0   0.480
+## 3 herbi     Rodentia           nt        14.4   1.350
+## 4  omni Soricomorpha           lc        14.9   0.019
+## 5 herbi Artiodactyla domesticated         4.0 600.000
+## 6 herbi       Pilosa         &lt;NA&gt;        14.4   3.850</code></pre>
+<p>or <code>one_of()</code></p>
+<pre class="r"><code>head(select(msleep, one_of(c(&quot;name&quot;, &quot;order&quot;))))</code></pre>
+<pre><code>##                         name        order
+## 1                    Cheetah    Carnivora
+## 2                 Owl monkey     Primates
+## 3            Mountain beaver     Rodentia
+## 4 Greater short-tailed shrew Soricomorpha
+## 5                        Cow Artiodactyla
+## 6           Three-toed sloth       Pilosa</code></pre>
+<p>Note this last could also have been created by</p>
+<pre class="r"><code>head(select(msleep, name, order))</code></pre>
+<pre><code>##                         name        order
+## 1                    Cheetah    Carnivora
+## 2                 Owl monkey     Primates
+## 3            Mountain beaver     Rodentia
+## 4 Greater short-tailed shrew Soricomorpha
+## 5                        Cow Artiodactyla
+## 6           Three-toed sloth       Pilosa</code></pre>
+<p>And a programmatically almost useless <code>everything()</code></p>
+<pre class="r"><code>head(select(msleep, everything()))</code></pre>
+<pre><code>##                         name      genus  vore        order conservation
+## 1                    Cheetah   Acinonyx carni    Carnivora           lc
+## 2                 Owl monkey      Aotus  omni     Primates         &lt;NA&gt;
+## 3            Mountain beaver Aplodontia herbi     Rodentia           nt
+## 4 Greater short-tailed shrew    Blarina  omni Soricomorpha           lc
+## 5                        Cow        Bos herbi Artiodactyla domesticated
+## 6           Three-toed sloth   Bradypus herbi       Pilosa         &lt;NA&gt;
+##   sleep_total sleep_rem sleep_cycle awake brainwt  bodywt
+## 1        12.1        NA          NA  11.9      NA  50.000
+## 2        17.0       1.8          NA   7.0 0.01550   0.480
+## 3        14.4       2.4          NA   9.6      NA   1.350
+## 4        14.9       2.3   0.1333333   9.1 0.00029   0.019
+## 5         4.0       0.7   0.6666667  20.0 0.42300 600.000
+## 6        14.4       2.2   0.7666667   9.6      NA   3.850</code></pre>
 </div>
+</div>
+</div>
+<div id="selecting-rows-using-filter" class="section level2">
+<h2>Selecting rows using <code>filter()</code></h2>
+<p>In SQL parlance “SELECT columns FROM table WHERE condition” this is part of the WHERE statement</p>
+<pre class="r"><code>filter(msleep, sleep_total &gt;= 16)</code></pre>
+<pre><code>##                     name        genus    vore           order conservation
+## 1             Owl monkey        Aotus    omni        Primates         &lt;NA&gt;
+## 2   Long-nosed armadillo      Dasypus   carni       Cingulata           lc
+## 3 North American Opossum    Didelphis    omni Didelphimorphia           lc
+## 4          Big brown bat    Eptesicus insecti      Chiroptera           lc
+## 5   Thick-tailed opposum   Lutreolina   carni Didelphimorphia           lc
+## 6       Little brown bat       Myotis insecti      Chiroptera         &lt;NA&gt;
+## 7        Giant armadillo   Priodontes insecti       Cingulata           en
+## 8 Arctic ground squirrel Spermophilus   herbi        Rodentia           lc
+##   sleep_total sleep_rem sleep_cycle awake brainwt bodywt
+## 1        17.0       1.8          NA   7.0 0.01550  0.480
+## 2        17.4       3.1   0.3833333   6.6 0.01080  3.500
+## 3        18.0       4.9   0.3333333   6.0 0.00630  1.700
+## 4        19.7       3.9   0.1166667   4.3 0.00030  0.023
+## 5        19.4       6.6          NA   4.6      NA  0.370
+## 6        19.9       2.0   0.2000000   4.1 0.00025  0.010
+## 7        18.1       6.1          NA   5.9 0.08100 60.000
+## 8        16.6        NA          NA   7.4 0.00570  0.920</code></pre>
+<p>We could also do this with the pipe operator <code>%&gt;%</code> as</p>
+<pre class="r"><code>msleep %&gt;%
+  filter(sleep_total &gt;= 16) %&gt;%
+  head</code></pre>
+<pre><code>##                     name      genus    vore           order conservation
+## 1             Owl monkey      Aotus    omni        Primates         &lt;NA&gt;
+## 2   Long-nosed armadillo    Dasypus   carni       Cingulata           lc
+## 3 North American Opossum  Didelphis    omni Didelphimorphia           lc
+## 4          Big brown bat  Eptesicus insecti      Chiroptera           lc
+## 5   Thick-tailed opposum Lutreolina   carni Didelphimorphia           lc
+## 6       Little brown bat     Myotis insecti      Chiroptera         &lt;NA&gt;
+##   sleep_total sleep_rem sleep_cycle awake brainwt bodywt
+## 1        17.0       1.8          NA   7.0 0.01550  0.480
+## 2        17.4       3.1   0.3833333   6.6 0.01080  3.500
+## 3        18.0       4.9   0.3333333   6.0 0.00630  1.700
+## 4        19.7       3.9   0.1166667   4.3 0.00030  0.023
+## 5        19.4       6.6          NA   4.6      NA  0.370
+## 6        19.9       2.0   0.2000000   4.1 0.00025  0.010</code></pre>
+<p>or playing around with it more</p>
+<pre class="r"><code>msleep %&gt;%
+  filter(sleep_total &gt;= 16, bodywt &gt;= 1) %&gt;%
+  filter(vore %in% c(&quot;omni&quot;, &quot;insecti&quot;)) %&gt;%
+  head</code></pre>
+<pre><code>##                     name      genus    vore           order conservation
+## 1 North American Opossum  Didelphis    omni Didelphimorphia           lc
+## 2        Giant armadillo Priodontes insecti       Cingulata           en
+##   sleep_total sleep_rem sleep_cycle awake brainwt bodywt
+## 1        18.0       4.9   0.3333333   6.0  0.0063    1.7
+## 2        18.1       6.1          NA   5.9  0.0810   60.0</code></pre>
+<p>or</p>
+<pre class="r"><code>msleep %&gt;%
+  select(name, starts_with(&quot;sl&quot;)) %&gt;%
+  filter(sleep_total &gt;= 16) %&gt;%
+  head</code></pre>
+<pre><code>##                     name sleep_total sleep_rem sleep_cycle
+## 1             Owl monkey        17.0       1.8          NA
+## 2   Long-nosed armadillo        17.4       3.1   0.3833333
+## 3 North American Opossum        18.0       4.9   0.3333333
+## 4          Big brown bat        19.7       3.9   0.1166667
+## 5   Thick-tailed opposum        19.4       6.6          NA
+## 6       Little brown bat        19.9       2.0   0.2000000</code></pre>
+<p>Note that filter can use the boolean operators <code>&gt;=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>!=</code>, <code>==</code>, <code>%in%</code> to create the conditions</p>
 </div>
 
 

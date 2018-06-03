@@ -25,6 +25,7 @@ head(msleep)
 ```
 
 ## Important `dplyr` verbs
+These `dplyr` verbs are important to remember:
 
 * `select()`
 * `filter()`
@@ -43,15 +44,78 @@ head(msleep)
 | `group_by()`| Like SQL `group by`|
 
 ### Selecting columns using `select()`
-
+Select the `name` and `sleep_total` columns:
 ```{r dplyr1}
 sleepData <- select(msleep, name, sleep_total)
 head(sleepData)
 ```
-
+Select all but the `name` column
 ```{r dplyr2}
 head(select(msleep, -name))
 ```
+Select a range of columns using the `:` operator
 ```{r dplyr3}
-
+head(select(msleep, name:order))
 ```
+
+#### Other matching criteria
+
+Select all columns starting with the string "sl" using the `starts_with()` function
+```{r dplyr4}
+head(select(msleep, starts_with("sl")))
+```
+Do something similar with `ends_with()`
+```{r dplyr5}
+head(select(msleep, ends_with("wt")))
+```
+`contains()`
+```{r}
+head(select(msleep, contains("_")))
+```
+`matches()` for regular expressions
+```{r}
+head(select(msleep, matches("*o[rn]*")))
+```
+or `one_of()`
+```{r}
+head(select(msleep, one_of(c("name", "order"))))
+```
+
+Note this last could also have been created by
+```{r}
+head(select(msleep, name, order))
+```
+And a programmatically almost useless `everything()`
+```{r}
+head(select(msleep, everything()))
+```
+
+## Selecting rows using `filter()`
+In SQL parlance "SELECT columns FROM table WHERE condition" this is part of the WHERE statement
+```{r}
+filter(msleep, sleep_total >= 16)
+```
+We could also do this with the pipe operator `%>%` as
+```{r}
+msleep %>%
+  filter(sleep_total >= 16) %>%
+  head
+```
+or playing around with it more
+```{r}
+msleep %>%
+  filter(sleep_total >= 16, bodywt >= 1) %>%
+  filter(vore %in% c("omni", "insecti")) %>%
+  head
+```
+or
+```{r}
+msleep %>%
+  select(name, starts_with("sl")) %>%
+  filter(sleep_total >= 16) %>%
+  head
+```
+Note that filter can use the boolean operators `>=`, `>`, `<`, `<=`, `!=`, `==`, `%in%` to create the conditions
+
+
+
