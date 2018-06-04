@@ -89,6 +89,11 @@ And a programmatically almost useless `everything()`
 ```{r}
 head(select(msleep, everything()))
 ```
+However, I am told that `everything()` is used to rearrange the order of columns without having to write them all out:
+```{r}
+head(select(msleep, starts_with("sleep"),everything()))
+```
+
 
 ## Selecting rows using `filter()`
 In SQL parlance "SELECT columns FROM table WHERE condition" this is part of the WHERE statement
@@ -116,6 +121,130 @@ msleep %>%
   head
 ```
 Note that filter can use the boolean operators `>=`, `>`, `<`, `<=`, `!=`, `==`, `%in%` to create the conditions
+
+### Using `group_by()`
+We can use the `group_by()` functionality with the `summarise()` to create new columns based on summary statistics
+```{r}
+msleep %>%
+  group_by(order) %>%
+  summarise(avg_sleep = mean(sleep_total),
+            min_sleep = min(sleep_total),
+            max_sleep = max(sleep_total),
+            total = n())
+```
+
+More on `summarise()`:
+
+`n()` returns the length of the vector, `first()` and `last()` return the first and last values in the vector, and `n_distinct()` is the number of distinct values in the vector.
+
+Now putting everything together:
+```{r}
+msleep %>%
+  group_by(order) %>%
+  summarise(avg_sleep = mean(sleep_total),
+            min_sleep = min(sleep_total),
+            max_sleep = max(sleep_total),
+            total = n()) %>%
+  filter(total > 1) %>%
+  arrange(desc(total), desc(avg_sleep))
+```
+
+## Data Transformations
+## Joins
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+The tables are
+```{r}
+airlines
+airports
+planes
+weather
+```
+These tables are connected as follows:
+
+* `tailnum` connects `planes` and `flights`
+* `carrier` connects `airlines` and `flights`
+* `flights` connects to `airports` via `origin` and `dest` variables
+* `weather` connects to `flights` via `origin`, `year`, `month`, `day`, and `hour` 
+
+Count the primary keys and check that they are indeed unique
+```{r}
+planes %>% 
+  count(tailnum)
+```
+add the filter to check uniqueness
+```{r}
+planes %>% 
+  count(tailnum) %>%
+  filter(n>1)
+```
+Do the same for weather
+```{r}
+weather %>%
+  count(year, month, day, hour, origin) %>%
+  filter(n>1)
+```
+
+Some tables have complex primary keys
+```{r}
+flights %>%
+  count(year, month, day, flight) %>%
+  filter(n>1)
+```
+So the flight number is not unique, are there every any more than 2 flights?
+```{r}
+flights %>%
+  count(year, month, day, flight) %>%
+  filter(n>2) %>%
+  arrange(desc(n))
+```
+So at least 2,729 flights have more than 2 (and up to 4) flights per day. Let's add `hour`
+```{r}
+flights %>%
+  count(year, month, day, flight, hour) %>%
+  filter(n>1) %>%
+  arrange(desc(n))
+```
+Wow, that was not even sufficient! Let's add minute as well
+```{r}
+flights %>%
+  count(year, month, day, flight, hour, minute) %>%
+  filter(n>1)
+```
+What about `tailnum`?
+```{r}
+flights %>%
+  count(year, month, day, flight, tailnum, hour, minute) %>%
+  filter(n>1)
+```
+Finally, this appears like it would be sufficient to create a primary key. It would be easiest to construct a primary key after doing this complete grouping, or just do a primary key by row number:
+```{r}
+flights %>%
+  mutate(primary_key = row_number()) %>%
+  select(primary_key, everything())
+```
+
+### Joins
+```{r}
+flights2 <- flights %>%
+  select(year:day, hour, origin, dest, tailnum, carrier)
+flights2
+```
+Now left join to get the full airline name
+```{r}
+flights2 %>%
+  select(-origin, -dest) %>%
+  left_join(airlines, by="carrier")
+```
+
+An example of a more complex by statement is
+```{r}
+flights2 %>%
+  left_join(airports, by=c("dest"="faa"))
+```
 
 
 

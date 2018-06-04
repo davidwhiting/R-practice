@@ -1,0 +1,30 @@
+---
+title: "lubridate.Rmd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Here we use the `lubridate` package to deal with dates and times
+```{r}
+library(tidyverse)
+
+library(lubridate)
+library(nycflights13)
+```
+
+And see if it's loaded correctly
+```{r}
+today()
+now()
+```
+
+Now load a csv file
+```{r}
+mtcars <- read_csv(readr_example("mtcars.csv"))
+```
+
+The `read_delim()` is the most general, where we can define any delimiter. The `read_log()` is for apache-style log files. We can also use the `webreadr` library for other types of log files.
+
