@@ -28,3 +28,7 @@ mtcars <- read_csv(readr_example("mtcars.csv"))
 
 The `read_delim()` is the most general, where we can define any delimiter. The `read_log()` is for apache-style log files. We can also use the `webreadr` library for other types of log files.
 
+```{r}
+read_
+```
+
