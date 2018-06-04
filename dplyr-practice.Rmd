@@ -339,4 +339,16 @@ as_datetime(60*60*10)
 as_date(365*10 + 2)
 ```
 
+### Durations
+```{r}
+d_age <- today() - ymd(19631203)
+d_age
+as.duration(d_age)
+dseconds(15)
+dminutes(10)
+dhours(c(12,24))
+ddays(0:5)
+dweeks(3)
+dyears(1)
+```
 
